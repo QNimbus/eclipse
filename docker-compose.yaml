@@ -1,0 +1,31 @@
+services:
+  app:
+    image: qnimbus/eclipse:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"    # Expose HTTP
+      - "443:443"  # Expose HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile # Mount the Caddyfile
+      - caddy_data:/data                 # Persist Caddy data (e.g., certificates)
+      - caddy_config:/config             # Persist Caddy config
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
